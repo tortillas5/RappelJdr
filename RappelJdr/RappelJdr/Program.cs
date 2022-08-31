@@ -7,6 +7,7 @@
     using System.Threading.Channels;
     using System.Threading.Tasks;
     using Discord;
+    using Discord.Net;
     using Discord.WebSocket;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
@@ -29,6 +30,8 @@
 
         public async void SendMessageSessions()
         {
+            Thread.Sleep(10000);
+
             while (true)
             {
                 var sessions = MessageHandler.SessionService.GetEntities();
@@ -38,6 +41,11 @@
                     try
                     {
                         await _client.GetGuild(session.ServerId).GetTextChannel(session.ChannelId).SendMessageAsync("Prochaine session le " + session.Date.ToString());
+
+                        if (session.Date < DateTime.Now)
+                        {
+                            MessageHandler.DeleteSession(session.Id);
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -45,7 +53,7 @@
                     }
                 }
 
-                Thread.Sleep(10000);
+                Thread.Sleep(3600000);
             }
         }
 
