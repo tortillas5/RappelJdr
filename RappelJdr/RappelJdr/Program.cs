@@ -68,12 +68,23 @@
                 {
                     try
                     {
-                        await _client.GetGuild(session.ServerId).GetTextChannel(session.ChannelId).SendMessageAsync("Prochaine session le " + session.Date.ToString());
-
-                        // Suppression des sessions passées.
+                        // Suppression si la session est passée.
                         if (session.Date < DateTime.Now)
                         {
                             MessageHandler.DeleteSession(session.Id);
+                        }
+                        else
+                        {
+                            if (session.Date.Date == DateTime.Now.Date && session.Date.TimeOfDay <= DateTime.Now.TimeOfDay.Add(new TimeSpan(1, 0, 0)))
+                            {
+                                // Même jour & commence dans moins d'une heure.
+                                await _client.GetGuild(session.ServerId).GetTextChannel(session.ChannelId).SendMessageAsync("@everyone la prochaine session commence bientôt ! " + session.Date.ToString());
+                            }
+                            else if (session.Date.TimeOfDay <= DateTime.Now.TimeOfDay.Add(new TimeSpan(1, 0, 0)))
+                            {
+                                // Jour différent et commencera environ dans l'heure.
+                                await _client.GetGuild(session.ServerId).GetTextChannel(session.ChannelId).SendMessageAsync("Prochaine session le " + session.Date.ToString());
+                            }
                         }
                     }
                     catch (Exception ex)
@@ -82,7 +93,7 @@
                     }
                 }
 
-                Thread.Sleep(new TimeSpan(0, 10, 0));
+                Thread.Sleep(new TimeSpan(0, 59, 0));
             }
         }
 
