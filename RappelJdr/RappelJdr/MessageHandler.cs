@@ -1,10 +1,8 @@
-﻿namespace DiscordBot
+﻿namespace RappelJdr
 {
     using System;
-    using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
-    using Discord;
     using TortillasDatabase;
     using TortillasEntities;
 
@@ -13,11 +11,25 @@
     /// </summary>
     public static class MessageHandler
     {
-        public static SessionService SessionService { get; set; }
-
         static MessageHandler()
         {
             SessionService = new SessionService();
+        }
+
+        public static SessionService SessionService { get; set; }
+
+        public static string DeleteSession(int id)
+        {
+            try
+            {
+                SessionService.RemoveById(id);
+
+                return "La session a bien été supprimée.";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
         }
 
         /// <summary>
@@ -31,29 +43,6 @@
                 "-set dd/MM/yyyy HH:mm Défini une session à rappeler.\n" +
                 "-list Liste des sessions mises en rappel.\n" +
                 "-delete [Number] Supprime une session avec son numéro.\n";
-        }
-
-        public static string SetSession(string sessionDate, ulong serverId, ulong channelId)
-        {
-            try
-            {
-                DateTime dateSession = DateTime.ParseExact(sessionDate, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture);
-
-                Session session = new Session()
-                {
-                    Date = dateSession,
-                    ServerId = serverId,
-                    ChannelId = channelId
-                };
-
-                SessionService.Add(session);
-
-                return "La session a bien été ajoutée";
-            }
-            catch (Exception ex)
-            {
-                return ex.Message;
-            }
         }
 
         public static string ListSession()
@@ -77,13 +66,27 @@
             }
         }
 
-        public static string DeleteSession(int id)
+        public static string SetSession(string sessionDate, ulong serverId, ulong channelId)
         {
             try
             {
-                SessionService.RemoveById(id);
+                DateTime dateSession = DateTime.ParseExact(sessionDate, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture);
 
-                return "La session a bien été supprimée.";
+                if (dateSession < DateTime.Now)
+                {
+                    return "Impossible d'ajouter une session dans le passé.";
+                }
+
+                Session session = new Session()
+                {
+                    Date = dateSession,
+                    ServerId = serverId,
+                    ChannelId = channelId
+                };
+
+                SessionService.Add(session);
+
+                return "La session a bien été ajoutée";
             }
             catch (Exception ex)
             {

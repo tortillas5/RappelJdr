@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using TortillasEntities;
-
-namespace TortillasDatabase
+﻿namespace TortillasDatabase
 {
+    using TortillasEntities;
+
     /// <summary>
     /// Classe de service pour les entités de type Article.
     /// </summary>

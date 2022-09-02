@@ -1,4 +1,4 @@
-﻿namespace DiscordBot
+﻿namespace RappelJdr
 {
     using Newtonsoft.Json;
 

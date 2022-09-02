@@ -1,16 +1,13 @@
-﻿namespace DiscordBot
+﻿namespace RappelJdr
 {
     using System;
     using System.IO;
     using System.Reflection;
     using System.Threading;
-    using System.Threading.Channels;
     using System.Threading.Tasks;
     using Discord;
-    using Discord.Net;
     using Discord.WebSocket;
     using Newtonsoft.Json;
-    using Newtonsoft.Json.Linq;
 
     /// <summary>
     /// Main class of the program, contain the main method that is launching all the others.
@@ -23,39 +20,10 @@
         private DiscordSocketClient _client;
 
         /// <summary>
-        ///
+        /// Lance la tâche MainAsync en tant que programme.
         /// </summary>
         /// <param name="args"></param>
         public static void Main(string[] args) => new Program().MainAsync().GetAwaiter().GetResult();
-
-        public async void SendMessageSessions()
-        {
-            Thread.Sleep(10000);
-
-            while (true)
-            {
-                var sessions = MessageHandler.SessionService.GetEntities();
-
-                foreach (var session in sessions)
-                {
-                    try
-                    {
-                        await _client.GetGuild(session.ServerId).GetTextChannel(session.ChannelId).SendMessageAsync("Prochaine session le " + session.Date.ToString());
-
-                        if (session.Date < DateTime.Now)
-                        {
-                            MessageHandler.DeleteSession(session.Id);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        _ = Log(new LogMessage(LogSeverity.Error, "SendMessage", ex.Message));
-                    }
-                }
-
-                Thread.Sleep(3600000);
-            }
-        }
 
         /// <summary>
         ///
@@ -81,6 +49,41 @@
 
             // Block this task until the program is closed.
             await Task.Delay(-1);
+        }
+
+        /// <summary>
+        /// Tâche s'occupant d'envoyer les messages de rappel de sessions aux cannaux correspondants.
+        /// </summary>
+        public async void SendMessageSessions()
+        {
+            // Au lancement de l'application on attend une dizaine de secondes que le bot soit connecté à discord.
+            Thread.Sleep(10000);
+
+            // Tant que le programme tourne.
+            while (true)
+            {
+                var sessions = MessageHandler.SessionService.GetEntities();
+
+                foreach (var session in sessions)
+                {
+                    try
+                    {
+                        await _client.GetGuild(session.ServerId).GetTextChannel(session.ChannelId).SendMessageAsync("Prochaine session le " + session.Date.ToString());
+
+                        // Suppression des sessions passées.
+                        if (session.Date < DateTime.Now)
+                        {
+                            MessageHandler.DeleteSession(session.Id);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _ = Log(new LogMessage(LogSeverity.Error, "SendMessage", ex.Message));
+                    }
+                }
+
+                Thread.Sleep(new TimeSpan(0, 10, 0));
+            }
         }
 
         /// <summary>
@@ -114,7 +117,7 @@
                         if (request.StartsWith("-set"))
                         {
                             var channel = (SocketGuildChannel)message.Channel;
-                            var guild = (SocketGuild)channel.Guild;
+                            SocketGuild guild = channel.Guild;
 
                             messageToSend = MessageHandler.SetSession(request.Replace("-set ", string.Empty), guild.Id, channel.Id);
                         }
