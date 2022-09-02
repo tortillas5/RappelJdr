@@ -26,9 +26,9 @@
         public static void Main(string[] args) => new Program().MainAsync().GetAwaiter().GetResult();
 
         /// <summary>
-        ///
+        /// Asynchronous task launched at the begging of the app, handle everything.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>This async task.</returns>
         public async Task MainAsync()
         {
             _client = new DiscordSocketClient();
@@ -43,9 +43,9 @@
 
             _client.MessageReceived += MessageReceived;
 
-            Thread t = new Thread(new ThreadStart(SendMessageSessions));
-
-            t.Start();
+            // Create and launch the task that send the messages saying there is sessions.
+            Thread sessionsMessagesThread = new Thread(new ThreadStart(SendMessageSessions));
+            sessionsMessagesThread.Start();
 
             // Block this task until the program is closed.
             await Task.Delay(-1);

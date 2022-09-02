@@ -11,13 +11,24 @@
     /// </summary>
     public static class MessageHandler
     {
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         static MessageHandler()
         {
             SessionService = new SessionService();
         }
 
+        /// <summary>
+        /// Get or set the service of the sessions.
+        /// </summary>
         public static SessionService SessionService { get; set; }
 
+        /// <summary>
+        /// Delete a session.
+        /// </summary>
+        /// <param name="id">Id of a session.</param>
+        /// <returns>Message saying if the deletion succeded or not.</returns>
         public static string DeleteSession(int id)
         {
             try
@@ -45,6 +56,11 @@
                 "-delete [Number] Supprime une session avec son numéro.\n";
         }
 
+        /// <summary>
+        /// Return a message with the list of the next rp sessions.
+        /// Return a message saying no next session if there is none.
+        /// </summary>
+        /// <returns>A message.</returns>
         public static string ListSession()
         {
             try
@@ -66,6 +82,13 @@
             }
         }
 
+        /// <summary>
+        /// Add a session.
+        /// </summary>
+        /// <param name="sessionDate">Date of the session to add.</param>
+        /// <param name="serverId">Id of the server sending the request.</param>
+        /// <param name="channelId">Id of the channel sending the request.</param>
+        /// <returns>Message saying if the adding was successful or not.</returns>
         public static string SetSession(string sessionDate, ulong serverId, ulong channelId)
         {
             try
