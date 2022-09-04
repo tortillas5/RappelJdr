@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32804.467
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RappelJdr", "RappelJdr\RappelJdr.csproj", "{5321E88A-9C3C-41A9-B1A9-06BC525B5301}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RappelJdr", "RappelJdr\RappelJdr.csproj", "{5321E88A-9C3C-41A9-B1A9-06BC525B5301}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RappelJdr.Database", "RappelJdr.Database\RappelJdr.Database.csproj", "{A8E55178-C894-407D-BDD5-7AC95D523170}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RappelJdr.Database", "RappelJdr.Database\RappelJdr.Database.csproj", "{A8E55178-C894-407D-BDD5-7AC95D523170}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RappelJdr.Entities", "RappelJdr.Entities\RappelJdr.Entities.csproj", "{EB69FFD8-93D0-4D54-9116-F70A164937B4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RappelJdr.Entities", "RappelJdr.Entities\RappelJdr.Entities.csproj", "{EB69FFD8-93D0-4D54-9116-F70A164937B4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

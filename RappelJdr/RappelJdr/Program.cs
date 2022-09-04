@@ -80,7 +80,7 @@
                                 // Même jour & commence dans moins d'une heure.
                                 await _client.GetGuild(session.ServerId).GetTextChannel(session.ChannelId).SendMessageAsync("@everyone la prochaine session commence bientôt ! " + session.Date.ToString());
                             }
-                            else if (session.Date.TimeOfDay <= DateTime.Now.TimeOfDay.Add(new TimeSpan(1, 0, 0)))
+                            else if (session.Date.TimeOfDay <= DateTime.Now.TimeOfDay.Add(new TimeSpan(1, 0, 0)) && session.Date.TimeOfDay >= DateTime.Now.TimeOfDay)
                             {
                                 // Jour différent et commencera environ dans l'heure.
                                 await _client.GetGuild(session.ServerId).GetTextChannel(session.ChannelId).SendMessageAsync("Prochaine session le " + session.Date.ToString());
