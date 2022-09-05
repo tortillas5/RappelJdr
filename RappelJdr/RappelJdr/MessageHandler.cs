@@ -29,14 +29,25 @@
         /// Delete a session.
         /// </summary>
         /// <param name="id">Id of a session.</param>
+        /// <param name="serverId">Id of the server sending the request.</param>
+        /// <param name="channelId">Id of the channel sending the request.</param>
         /// <returns>Message saying if the deletion succeded or not.</returns>
-        public static string DeleteSession(int id)
+        public static string DeleteSession(int id, ulong serverId, ulong channelId)
         {
             try
             {
-                SessionService.RemoveById(id);
+                var session = SessionService.GetEntities().FirstOrDefault(e => e.ServerId == serverId && e.ChannelId == channelId && e.Id == id);
 
-                return "La session a bien été supprimée.";
+                if (session != null)
+                {
+                    SessionService.RemoveById(id);
+
+                    return "La session a bien été supprimée.";
+                }
+                else
+                {
+                    return "Aucune session avec cet identifiant à supprimer.";
+                }
             }
             catch (Exception ex)
             {
@@ -61,12 +72,14 @@
         /// Return a message with the list of the next rp sessions.
         /// Return a message saying no next session if there is none.
         /// </summary>
+        /// <param name="serverId">Id of the server sending the request.</param>
+        /// <param name="channelId">Id of the channel sending the request.</param>
         /// <returns>A message.</returns>
-        public static string ListSession()
+        public static string ListSession(ulong serverId, ulong channelId)
         {
             try
             {
-                var sessions = SessionService.GetEntities();
+                var sessions = SessionService.GetEntities().Where(e => e.ServerId == serverId && e.ChannelId == channelId);
 
                 if (sessions.Count() > 0)
                 {

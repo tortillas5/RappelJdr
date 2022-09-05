@@ -71,7 +71,7 @@
                         // Suppression si la session est passée.
                         if (session.Date < DateTime.Now)
                         {
-                            MessageHandler.DeleteSession(session.Id);
+                            MessageHandler.DeleteSession(session.Id, session.ServerId, session.ChannelId);
                         }
                         else
                         {
@@ -125,20 +125,23 @@
                 {
                     if (request.StartsWith("-"))
                     {
+                        SocketGuildChannel channel = (SocketGuildChannel)message.Channel;
+                        SocketGuild guild = channel.Guild;
+
+                        ulong serverId = guild.Id;
+                        ulong channelId = channel.Id;
+
                         if (request.StartsWith("-set"))
                         {
-                            var channel = (SocketGuildChannel)message.Channel;
-                            SocketGuild guild = channel.Guild;
-
-                            messageToSend = MessageHandler.SetSession(request.Replace("-set ", string.Empty), guild.Id, channel.Id);
+                            messageToSend = MessageHandler.SetSession(request.Replace("-set ", string.Empty), serverId, channelId);
                         }
                         else if (request.StartsWith("-list"))
                         {
-                            messageToSend = MessageHandler.ListSession();
+                            messageToSend = MessageHandler.ListSession(serverId, channelId);
                         }
                         else if (request.StartsWith("-delete"))
                         {
-                            messageToSend = MessageHandler.DeleteSession(int.Parse(request.Replace("-delete ", string.Empty)));
+                            messageToSend = MessageHandler.DeleteSession(int.Parse(request.Replace("-delete ", string.Empty)), serverId, channelId);
                         }
                         else if (request.StartsWith("-help"))
                         {
