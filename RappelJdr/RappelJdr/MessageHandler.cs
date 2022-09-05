@@ -3,6 +3,7 @@
     using System;
     using System.Globalization;
     using System.Linq;
+    using System.Runtime.CompilerServices;
     using TortillasDatabase;
     using TortillasEntities;
 
@@ -100,6 +101,13 @@
                     return "Impossible d'ajouter une session dans le passé.";
                 }
 
+                var sessions =  SessionService.GetEntities();
+
+                if (sessions.Exists(m => m.Date == dateSession && m.ServerId == serverId && m.ChannelId == channelId))
+                {
+                    return "La session existe déjà.";
+                }
+
                 Session session = new Session()
                 {
                     Date = dateSession,
@@ -109,7 +117,7 @@
 
                 SessionService.Add(session);
 
-                return "La session a bien été ajoutée";
+                return "La session a bien été ajoutée.";
             }
             catch (Exception ex)
             {
