@@ -105,14 +105,18 @@
                         else if (command == "-addRole")
                         {
                             List<string> args = GetArguments(request);
+                            var userGuild = (SocketGuildUser)message.Author;
+                            bool adminUser = userGuild.GuildPermissions.Has(GuildPermission.ManageRoles);
 
-                            messageToSend = MessageHandler.AddRole(args[0], args[1], GetUserName(message.Author), guild.Roles.Select(r => r.Name).ToList(), serverId);
+                            messageToSend = MessageHandler.AddRole(args[0], args[1], GetUserName(message.Author), guild.Roles.Select(r => r.Name).ToList(), serverId, adminUser);
                         }
                         else if (command == "-removeRole")
                         {
                             List<string> args = GetArguments(request);
+                            var userGuild = (SocketGuildUser)message.Author;
+                            bool adminUser = userGuild.GuildPermissions.Has(GuildPermission.ManageRoles);
 
-                            messageToSend = MessageHandler.RemoveRole(args[0], GetUserName(message.Author), serverId);
+                            messageToSend = MessageHandler.RemoveRole(args[0], GetUserName(message.Author), serverId, adminUser);
                         }
                         else if (command == "-listRole")
                         {

@@ -21,13 +21,7 @@
         {
             SessionService = new SessionService();
             RoleService = new RoleService();
-            AdminService = new AdminService();
         }
-
-        /// <summary>
-        /// Get or set the service of the admins.
-        /// </summary>
-        public static AdminService AdminService { get; set; }
 
         /// <summary>
         /// Get or set the service of the roles.
@@ -165,12 +159,13 @@
         /// <param name="userName">Name of the user adding the rôle (must be an admin).</param>
         /// <param name="serverRoles">Existing roles of the server.</param>
         /// <param name="serverId">Id of the server.</param>
+        /// <param name="isAdmin">Value indicating if the user is admin of the server.</param>
         /// <returns>Message saying if the rôle was successfully added or not.</returns>
-        public static string AddRole(string emoji, string roleName, string userName, List<string> serverRoles, ulong serverId)
+        public static string AddRole(string emoji, string roleName, string userName, List<string> serverRoles, ulong serverId, bool isAdmin)
         {
             try
             {
-                if (!IsAdmin(userName, serverId))
+                if (!isAdmin)
                 {
                     return "Vous n'avez pas le droit.";
                 }
@@ -269,12 +264,13 @@
         /// <param name="emoji">Emoji of the role to remove.</param>
         /// <param name="userName">Name of the user removing the role (must be an admin).</param>
         /// <param name="serverId">Id of the server.</param>
-        /// <returns></returns>
-        public static string RemoveRole(string emoji, string userName, ulong serverId)
+        /// <param name="isAdmin">Value indicating if the user is admin of the server.</param>
+        /// <returns>A message.</returns>
+        public static string RemoveRole(string emoji, string userName, ulong serverId, bool isAdmin)
         {
             try
             {
-                if (!IsAdmin(userName, serverId))
+                if (!isAdmin)
                 {
                     return "Vous n'avez pas le droit.";
                 }
@@ -296,17 +292,6 @@
             {
                 return ex.Message;
             }
-        }
-
-        /// <summary>
-        /// Check wether a user is admin or not.
-        /// </summary>
-        /// <param name="userName">Name of an user.</param>
-        /// <param name="serverId">Id of the server.</param>
-        /// <returns>Value indicating if the user is admin or not.</returns>
-        private static bool IsAdmin(string userName, ulong serverId)
-        {
-            return AdminService.GetEntities().Exists(e => e.ServerId == serverId && e.Name == userName);
         }
 
         #endregion Roles
