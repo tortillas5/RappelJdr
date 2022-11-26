@@ -41,6 +41,7 @@
             string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"Token.json");
             string text = File.ReadAllText(path);
             Token token = (Token)JsonConvert.DeserializeObject(text, typeof(Token));
+
             await _client.LoginAsync(TokenType.Bot, token.Value);
             await _client.StartAsync();
 
@@ -205,7 +206,7 @@
         /// </summary>
         /// <param name="message">Message sent on a channel where the bot is.</param>
         /// <returns>The current method as a Task.</returns>
-        private async Task MessageReceived(SocketMessage message)
+        public async Task MessageReceived(SocketMessage message)
         {
             string messageToSend = string.Empty;
             string request = message.Content;
@@ -246,6 +247,8 @@
                         }
                         else if (command == "-addRole")
                         {
+                            // TODO Gérer les rôles par serveur.
+
                             List<string> args = GetArguments(request);
                             string userName = message.Author.Username + "#" + message.Author.Discriminator;
 
