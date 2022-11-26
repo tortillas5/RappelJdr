@@ -56,6 +56,14 @@
             await Task.Delay(-1);
         }
 
+        /// <summary>
+        /// Method executed when an action is added to a message.
+        /// Used for role gestion.
+        /// </summary>
+        /// <param name="message">Message wich was reacted to.</param>
+        /// <param name="channel">Current channel.</param>
+        /// <param name="reaction">Reaction wich someone reacted to.</param>
+        /// <returns>The current method as a Task.</returns>
         public async Task ReactionAdded(Cacheable<IUserMessage, ulong> message, Cacheable<IMessageChannel, ulong> channel, SocketReaction reaction)
         {
             try
@@ -81,6 +89,14 @@
             }
         }
 
+        /// <summary>
+        /// Method executed when an action is removed from a message.
+        /// Used for role gestion.
+        /// </summary>
+        /// <param name="message">Message wich was reacted to.</param>
+        /// <param name="channel">Current channel.</param>
+        /// <param name="reaction">Reaction wich someone reacted to.</param>
+        /// <returns>The current method as a Task.</returns>
         public async Task ReactionRemoved(Cacheable<IUserMessage, ulong> message, Cacheable<IMessageChannel, ulong> channel, SocketReaction reaction)
         {
             try
@@ -152,14 +168,24 @@
             }
         }
 
-        private List<string> GetArguments(string commands)
+        /// <summary>
+        /// Return the arguments of a message.
+        /// </summary>
+        /// <param name="message">Message of an user.</param>
+        /// <returns>List of arguments.</returns>
+        private List<string> GetArguments(string message)
         {
-            return commands.Split(' ').Where(c => !string.IsNullOrWhiteSpace(c) && !c.StartsWith('-')).ToList();
+            return message.Split(' ').Where(c => !string.IsNullOrWhiteSpace(c) && !c.StartsWith('-')).ToList();
         }
 
-        private string GetCommand(string request)
+        /// <summary>
+        /// Return the command (first part of the message) sent by an user.
+        /// </summary>
+        /// <param name="message">Message of an user.</param>
+        /// <returns>A command.</returns>
+        private string GetCommand(string message)
         {
-            return request.Split(' ')[0];
+            return message.Split(' ')[0];
         }
 
         /// <summary>
@@ -178,7 +204,7 @@
         /// Used to manage messages sent by the users.
         /// </summary>
         /// <param name="message">Message sent on a channel where the bot is.</param>
-        /// <returns></returns>
+        /// <returns>The current method as a Task.</returns>
         private async Task MessageReceived(SocketMessage message)
         {
             string messageToSend = string.Empty;
@@ -222,6 +248,8 @@
                         {
                             List<string> args = GetArguments(request);
                             string userName = message.Author.Username + "#" + message.Author.Discriminator;
+
+                            // TODO : vérifier que le rôle existe sur le serveur.
 
                             messageToSend = MessageHandler.AddRole(args[0], args[1], userName);
                         }

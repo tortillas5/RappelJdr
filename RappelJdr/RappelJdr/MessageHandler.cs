@@ -11,7 +11,7 @@
     using TortillasEntities;
 
     /// <summary>
-    /// Class handling the requests of the users.
+    /// Class handling the messages of the users.
     /// </summary>
     public static class MessageHandler
     {
@@ -25,8 +25,14 @@
             AdminService = new AdminService();
         }
 
+        /// <summary>
+        /// Get or set the service of the admins.
+        /// </summary>
         public static AdminService AdminService { get; set; }
 
+        /// <summary>
+        /// Get or set the service of the roles.
+        /// </summary>
         public static RoleService RoleService { get; set; }
 
         /// <summary>
@@ -152,6 +158,13 @@
 
         #region Roles
 
+        /// <summary>
+        /// Add a rôle to the list of possible rôles.
+        /// </summary>
+        /// <param name="emoji">Emoji to be used as a reaction.</param>
+        /// <param name="roleName">Name of the rôle to add.</param>
+        /// <param name="userName">Name of the user adding the rôle (must be an admin).</param>
+        /// <returns>Message saying if the rôle was successfully added or not.</returns>
         public static string AddRole(string emoji, string roleName, string userName)
         {
             try
@@ -189,6 +202,11 @@
             }
         }
 
+        /// <summary>
+        /// Return the list of possible roles and their names if there is any.
+        /// Return a message saying there is no role if there is none.
+        /// </summary>
+        /// <returns>A message.</returns>
         public static string ListRole()
         {
             try
@@ -210,6 +228,10 @@
             }
         }
 
+        /// <summary>
+        /// Return a message to react to with the list of existing roles.
+        /// </summary>
+        /// <returns>A message.</returns>
         public static string ReactTo()
         {
             try
@@ -232,6 +254,12 @@
             }
         }
 
+        /// <summary>
+        /// Remove a role with it's linked emoji.
+        /// </summary>
+        /// <param name="emoji">Emoji of the role to remove.</param>
+        /// <param name="userName">Name of the user removing the role (must be an admin).</param>
+        /// <returns></returns>
         public static string RemoveRole(string emoji, string userName)
         {
             try
@@ -260,6 +288,11 @@
             }
         }
 
+        /// <summary>
+        /// Check wether a user is admin or not.
+        /// </summary>
+        /// <param name="userName">Name of an user.</param>
+        /// <returns>Value indicating if the user is admin or not.</returns>
         private static bool IsAdmin(string userName)
         {
             return AdminService.GetEntities().Exists(e => e.Name == userName);
