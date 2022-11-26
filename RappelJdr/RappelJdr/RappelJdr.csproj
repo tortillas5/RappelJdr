@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Discord.Net" Version="3.7.2" />
+    <PackageReference Include="Discord.Net" Version="3.8.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -14,6 +14,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Help.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Token.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

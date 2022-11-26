@@ -1,13 +1,16 @@
 ﻿namespace RappelJdr
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
     using Discord;
     using Discord.WebSocket;
     using Newtonsoft.Json;
+    using RappelJdr.Entities;
 
     /// <summary>
     /// Main class of the program, contain the main method that is launching all the others.
@@ -42,6 +45,8 @@
             await _client.StartAsync();
 
             _client.MessageReceived += MessageReceived;
+            _client.ReactionAdded += ReactionAdded;
+            _client.ReactionRemoved += ReactionRemoved;
 
             // Create and launch the task that send the messages saying there is sessions.
             Thread sessionsMessagesThread = new Thread(new ThreadStart(SendMessageSessions));
@@ -49,6 +54,56 @@
 
             // Block this task until the program is closed.
             await Task.Delay(-1);
+        }
+
+        public async Task ReactionAdded(Cacheable<IUserMessage, ulong> message, Cacheable<IMessageChannel, ulong> channel, SocketReaction reaction)
+        {
+            try
+            {
+                if (ReactionHandler.IsFollowedMessage(reaction.MessageId))
+                {
+                    var roles = ReactionHandler.GetRoles();
+
+                    Role role = roles.FirstOrDefault(r => r.Emoji.Equals(reaction.Emote.Name));
+
+                    if (role != null)
+                    {
+                        var user = reaction.User.Value;
+                        var socketRole = ((SocketGuildChannel)reaction.Channel).Guild.Roles.FirstOrDefault(r => r.Name == role.Name);
+
+                        await (user as IGuildUser).AddRoleAsync(socketRole);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _ = Log(new LogMessage(LogSeverity.Error, "ReactionAdded", ex.Message));
+            }
+        }
+
+        public async Task ReactionRemoved(Cacheable<IUserMessage, ulong> message, Cacheable<IMessageChannel, ulong> channel, SocketReaction reaction)
+        {
+            try
+            {
+                if (ReactionHandler.IsFollowedMessage(reaction.MessageId))
+                {
+                    var roles = ReactionHandler.GetRoles();
+
+                    Role role = roles.FirstOrDefault(r => r.Emoji.Equals(reaction.Emote.Name));
+
+                    if (role != null)
+                    {
+                        var user = reaction.User.Value;
+                        var socketRole = ((SocketGuildChannel)reaction.Channel).Guild.Roles.FirstOrDefault(r => r.Name == role.Name);
+
+                        await (user as IGuildUser).RemoveRoleAsync(socketRole);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _ = Log(new LogMessage(LogSeverity.Error, "ReactionAdded", ex.Message));
+            }
         }
 
         /// <summary>
@@ -89,12 +144,22 @@
                     }
                     catch (Exception ex)
                     {
-                        _ = Log(new LogMessage(LogSeverity.Error, "SendMessage", ex.Message));
+                        _ = Log(new LogMessage(LogSeverity.Error, "SendMessageSessions", ex.Message));
                     }
                 }
 
                 Thread.Sleep(new TimeSpan(0, 59, 0));
             }
+        }
+
+        private List<string> GetArguments(string commands)
+        {
+            return commands.Split(' ').Where(c => !string.IsNullOrWhiteSpace(c) && !c.StartsWith('-')).ToList();
+        }
+
+        private string GetCommand(string request)
+        {
+            return request.Split(' ')[0];
         }
 
         /// <summary>
@@ -131,21 +196,60 @@
                         ulong serverId = guild.Id;
                         ulong channelId = channel.Id;
 
-                        if (request.StartsWith("-set"))
+                        string command = GetCommand(request);
+
+                        if (command == "-set")
                         {
-                            messageToSend = MessageHandler.SetSession(request.Replace("-set ", string.Empty), serverId, channelId);
+                            List<string> args = GetArguments(request);
+
+                            messageToSend = MessageHandler.SetSession(args[0] + " " + args[1], serverId, channelId);
                         }
-                        else if (request.StartsWith("-list"))
+                        else if (command == "-list")
                         {
                             messageToSend = MessageHandler.ListSession(serverId, channelId);
                         }
-                        else if (request.StartsWith("-delete"))
+                        else if (command == "-delete")
                         {
-                            messageToSend = MessageHandler.DeleteSession(int.Parse(request.Replace("-delete ", string.Empty)), serverId, channelId);
+                            List<string> args = GetArguments(request);
+
+                            messageToSend = MessageHandler.DeleteSession(int.Parse(args[0]), serverId, channelId);
                         }
-                        else if (request.StartsWith("-help"))
+                        else if (command == "-help")
                         {
                             messageToSend = MessageHandler.Help();
+                        }
+                        else if (command == "-addRole")
+                        {
+                            List<string> args = GetArguments(request);
+                            string userName = message.Author.Username + "#" + message.Author.Discriminator;
+
+                            messageToSend = MessageHandler.AddRole(args[0], args[1], userName);
+                        }
+                        else if (command == "-removeRole")
+                        {
+                            List<string> args = GetArguments(request);
+                            string userName = message.Author.Username + message.Author.Discriminator;
+
+                            messageToSend = MessageHandler.RemoveRole(args[0], userName);
+                        }
+                        else if (command == "-listRole")
+                        {
+                            messageToSend = MessageHandler.ListRole();
+                        }
+                        else if (command == "-react")
+                        {
+                            try
+                            {
+                                var sentMessage = await message.Channel.SendMessageAsync(MessageHandler.ReactTo());
+
+                                ReactionHandler.MessageToFollow(sentMessage.Id);
+                            }
+                            catch (Exception ex)
+                            {
+                                _ = Log(new LogMessage(LogSeverity.Error, "MessageToFollow", ex.Message));
+                            }
+
+                            return;
                         }
                     }
                 }

@@ -1,0 +1,9 @@
+Liste des commandes :
+-help Liste des commandes.
+-set dd/MM/yyyy HH:mm Défini une session à rappeler.
+-list Liste des sessions mises en rappel.
+-delete [Number] Supprime une session avec son numéro.
+-addRole [Emoji] [RoleName] Lie un rôle à un emoji.
+-removeRole [Emoji] Supprime un rôle et son émoji de la liste des réactions.
+-listRole Liste des rôles définis et leur émojis.
+-react Envoie un message qui sert à gérer les rôles quand on y réagit.

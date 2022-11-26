@@ -190,12 +190,7 @@ namespace TortillasDatabase
         /// <returns>Filename (xxx.txt).</returns>
         private string GetFileNameByType(Type type)
         {
-            if (type == typeof(Session))
-            {
-                return "Session.txt";
-            }
-
-            return null;
+            return type.Name + ".txt";
         }
     }
 }

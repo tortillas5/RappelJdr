@@ -2,8 +2,11 @@
 {
     using System;
     using System.Globalization;
+    using System.IO;
     using System.Linq;
-    using System.Runtime.CompilerServices;
+    using System.Reflection;
+    using RappelJdr.Database;
+    using RappelJdr.Entities;
     using TortillasDatabase;
     using TortillasEntities;
 
@@ -18,12 +21,32 @@
         static MessageHandler()
         {
             SessionService = new SessionService();
+            RoleService = new RoleService();
+            AdminService = new AdminService();
         }
+
+        public static AdminService AdminService { get; set; }
+
+        public static RoleService RoleService { get; set; }
 
         /// <summary>
         /// Get or set the service of the sessions.
         /// </summary>
         public static SessionService SessionService { get; set; }
+
+        /// <summary>
+        /// Retourne la liste des commandes utilisables par le bot.
+        /// </summary>
+        /// <returns>Message contenant les commandes utilisables par le bot.</returns>
+        public static string Help()
+        {
+            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"Help.txt");
+            string text = File.ReadAllText(path);
+
+            return text;
+        }
+
+        #region Sessions
 
         /// <summary>
         /// Delete a session.
@@ -53,19 +76,6 @@
             {
                 return ex.Message;
             }
-        }
-
-        /// <summary>
-        /// Retourne la liste des commandes utilisables par le bot.
-        /// </summary>
-        /// <returns>Message contenant les commandes utilisables par le bot.</returns>
-        public static string Help()
-        {
-            return "Liste des commandes :\n" +
-                "-help Liste des commandes.\n" +
-                "-set dd/MM/yyyy HH:mm Défini une session à rappeler.\n" +
-                "-list Liste des sessions mises en rappel.\n" +
-                "-delete [Number] Supprime une session avec son numéro.\n";
         }
 
         /// <summary>
@@ -114,7 +124,7 @@
                     return "Impossible d'ajouter une session dans le passé.";
                 }
 
-                var sessions =  SessionService.GetEntities();
+                var sessions = SessionService.GetEntities();
 
                 if (sessions.Exists(m => m.Date == dateSession && m.ServerId == serverId && m.ChannelId == channelId))
                 {
@@ -137,5 +147,124 @@
                 return ex.Message;
             }
         }
+
+        #endregion Sessions
+
+        #region Roles
+
+        public static string AddRole(string emoji, string roleName, string userName)
+        {
+            try
+            {
+                if (!IsAdmin(userName))
+                {
+                    return "Vous n'avez pas le droit.";
+                }
+
+                var roles = RoleService.GetEntities();
+
+                if (roles.Exists(e => e.Emoji == emoji))
+                {
+                    return "Emoji déjà utilisé.";
+                }
+
+                if (roles.Exists(e => e.Name == roleName))
+                {
+                    return "Rôle déjà attribué à un emoji.";
+                }
+
+                Role role = new Role()
+                {
+                    Emoji = emoji,
+                    Name = roleName
+                };
+
+                RoleService.Add(role);
+
+                return "Le rôle a bien été ajouté.";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
+        public static string ListRole()
+        {
+            try
+            {
+                var roles = RoleService.GetEntities();
+
+                if (roles.Count() > 0)
+                {
+                    return "Liste des rôles :\n" + String.Join("\n", roles.Select(e => e.Emoji + " : " + e.Name));
+                }
+                else
+                {
+                    return "Aucun rôle défini.";
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
+        public static string ReactTo()
+        {
+            try
+            {
+                var roles = RoleService.GetEntities();
+
+                if (roles.Count() > 0)
+                {
+                    return "Réagissez à ce message pour vous ajouter / retirer un rôle.\n" +
+                        "Liste des rôles :\n" + String.Join("\n", roles.Select(e => e.Emoji + " : " + e.Name));
+                }
+                else
+                {
+                    return "Aucun rôle défini.";
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
+        public static string RemoveRole(string emoji, string userName)
+        {
+            try
+            {
+                if (!IsAdmin(userName))
+                {
+                    return "Vous n'avez pas le droit.";
+                }
+
+                var role = RoleService.GetEntities().FirstOrDefault(e => e.Emoji == emoji);
+
+                if (role != null)
+                {
+                    RoleService.Remove(role);
+
+                    return "Le rôle a bien été retiré de la liste des réactions.";
+                }
+                else
+                {
+                    return "Aucun rôle n'est lié à cet émoji.";
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
+        private static bool IsAdmin(string userName)
+        {
+            return AdminService.GetEntities().Exists(e => e.Name == userName);
+        }
+
+        #endregion Roles
     }
 }
