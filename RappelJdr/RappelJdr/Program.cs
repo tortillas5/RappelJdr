@@ -107,18 +107,14 @@
                             // TODO Gérer les rôles par serveur.
 
                             List<string> args = GetArguments(request);
-                            string userName = message.Author.Username + "#" + message.Author.Discriminator;
 
-                            messageToSend = MessageHandler.AddRole(args[0], args[1], userName, guild.Roles.Select(r => r.Name).ToList());
+                            messageToSend = MessageHandler.AddRole(args[0], args[1], GetUserName(message.Author), guild.Roles.Select(r => r.Name).ToList());
                         }
                         else if (command == "-removeRole")
                         {
                             List<string> args = GetArguments(request);
-                            string userName = message.Author.Username + "#" + message.Author.Discriminator;
 
-                            // TODO method pour récupérer le username.
-
-                            messageToSend = MessageHandler.RemoveRole(args[0], userName);
+                            messageToSend = MessageHandler.RemoveRole(args[0], GetUserName(message.Author));
                         }
                         else if (command == "-listRole")
                         {
@@ -290,6 +286,16 @@
         private string GetCommand(string message)
         {
             return message.Split(' ')[0];
+        }
+
+        /// <summary>
+        /// Return the full username (name#1234) of a SockerUser.
+        /// </summary>
+        /// <param name="user">A socketUser.</param>
+        /// <returns>A full username.</returns>
+        private string GetUserName(SocketUser user)
+        {
+            return user.Username + "#" + user.Discriminator;
         }
 
         /// <summary>
