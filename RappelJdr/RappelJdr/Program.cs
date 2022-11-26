@@ -108,7 +108,7 @@
                             var userGuild = (SocketGuildUser)message.Author;
                             bool adminUser = userGuild.GuildPermissions.Has(GuildPermission.ManageRoles);
 
-                            messageToSend = MessageHandler.AddRole(args[0], args[1], GetUserName(message.Author), guild.Roles.Select(r => r.Name).ToList(), serverId, adminUser);
+                            messageToSend = MessageHandler.AddRole(args[0], string.Join(" ", args.Skip(1)), GetUserName(message.Author), guild.Roles.Select(r => r.Name).ToList(), serverId, adminUser);
                         }
                         else if (command == "-removeRole")
                         {
