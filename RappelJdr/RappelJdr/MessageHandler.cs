@@ -1,6 +1,7 @@
 ﻿namespace RappelJdr
 {
     using System;
+    using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
     using System.Linq;
@@ -163,13 +164,18 @@
         /// <param name="roleName">Name of the rôle to add.</param>
         /// <param name="userName">Name of the user adding the rôle (must be an admin).</param>
         /// <returns>Message saying if the rôle was successfully added or not.</returns>
-        public static string AddRole(string emoji, string roleName, string userName)
+        public static string AddRole(string emoji, string roleName, string userName, List<string> serverRoles)
         {
             try
             {
                 if (!IsAdmin(userName))
                 {
                     return "Vous n'avez pas le droit.";
+                }
+
+                if (!serverRoles.Contains(roleName))
+                {
+                    return "Ce rôle n'existe pas sur le serveur.";
                 }
 
                 var roles = RoleService.GetEntities();

@@ -252,14 +252,14 @@
                             List<string> args = GetArguments(request);
                             string userName = message.Author.Username + "#" + message.Author.Discriminator;
 
-                            // TODO : vérifier que le rôle existe sur le serveur.
-
-                            messageToSend = MessageHandler.AddRole(args[0], args[1], userName);
+                            messageToSend = MessageHandler.AddRole(args[0], args[1], userName, guild.Roles.Select(r => r.Name).ToList());
                         }
                         else if (command == "-removeRole")
                         {
                             List<string> args = GetArguments(request);
-                            string userName = message.Author.Username + message.Author.Discriminator;
+                            string userName = message.Author.Username + "#" + message.Author.Discriminator;
+
+                            // TODO method pour récupérer le username.
 
                             messageToSend = MessageHandler.RemoveRole(args[0], userName);
                         }
