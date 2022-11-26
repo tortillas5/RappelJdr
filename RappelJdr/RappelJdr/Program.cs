@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Data;
     using System.IO;
     using System.Linq;
     using System.Reflection;
@@ -177,7 +178,7 @@
                 {
                     var roles = ReactionHandler.GetRoles(serverId);
 
-                    Role role = roles.FirstOrDefault(r => r.Emoji.Equals(reaction.Emote.Name));
+                    Role role = roles.FirstOrDefault(r => r.Emoji.Contains(':') ? GetPersonnalizedEmoji(r.Emoji).Equals(reaction.Emote.Name) : r.Emoji.Equals(reaction.Emote.Name));
 
                     if (role != null)
                     {
@@ -213,7 +214,7 @@
                 {
                     var roles = ReactionHandler.GetRoles(serverId);
 
-                    Role role = roles.FirstOrDefault(r => r.Emoji.Equals(reaction.Emote.Name));
+                    Role role = roles.FirstOrDefault(r => r.Emoji.Contains(':') ? GetPersonnalizedEmoji(r.Emoji).Equals(reaction.Emote.Name) : r.Emoji.Equals(reaction.Emote.Name));
 
                     if (role != null)
                     {
@@ -294,6 +295,19 @@
         private string GetCommand(string message)
         {
             return message.Split(' ')[0];
+        }
+
+        /// <summary>
+        /// Return the name of a personnalized emoji.
+        /// </summary>
+        /// <param name="personnalizedEmoji">Personnalized emoji with metadata.</param>
+        /// <returns>Name of the personnalized emoji.</returns>
+        private string GetPersonnalizedEmoji(string personnalizedEmoji)
+        {
+            int begining = personnalizedEmoji.IndexOf(':');
+            int end = personnalizedEmoji.LastIndexOf(":");
+
+            return personnalizedEmoji.Substring(begining + 1, end - begining - 1);
         }
 
         /// <summary>
