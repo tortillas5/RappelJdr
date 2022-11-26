@@ -58,6 +58,109 @@
         }
 
         /// <summary>
+        /// Executed when a message is received.
+        /// Used to manage messages sent by the users.
+        /// </summary>
+        /// <param name="message">Message sent on a channel where the bot is.</param>
+        /// <returns>The current method as a Task.</returns>
+        public async Task MessageReceived(SocketMessage message)
+        {
+            string messageToSend = string.Empty;
+            string request = message.Content;
+
+            try
+            {
+                if (request != null)
+                {
+                    if (request.StartsWith("-"))
+                    {
+                        SocketGuildChannel channel = (SocketGuildChannel)message.Channel;
+                        SocketGuild guild = channel.Guild;
+
+                        ulong serverId = guild.Id;
+                        ulong channelId = channel.Id;
+
+                        string command = GetCommand(request);
+
+                        if (command == "-set")
+                        {
+                            List<string> args = GetArguments(request);
+
+                            messageToSend = MessageHandler.SetSession(args[0] + " " + args[1], serverId, channelId);
+                        }
+                        else if (command == "-list")
+                        {
+                            messageToSend = MessageHandler.ListSession(serverId, channelId);
+                        }
+                        else if (command == "-delete")
+                        {
+                            List<string> args = GetArguments(request);
+
+                            messageToSend = MessageHandler.DeleteSession(int.Parse(args[0]), serverId, channelId);
+                        }
+                        else if (command == "-help")
+                        {
+                            messageToSend = MessageHandler.Help();
+                        }
+                        else if (command == "-addRole")
+                        {
+                            // TODO Gérer les rôles par serveur.
+
+                            List<string> args = GetArguments(request);
+                            string userName = message.Author.Username + "#" + message.Author.Discriminator;
+
+                            messageToSend = MessageHandler.AddRole(args[0], args[1], userName, guild.Roles.Select(r => r.Name).ToList());
+                        }
+                        else if (command == "-removeRole")
+                        {
+                            List<string> args = GetArguments(request);
+                            string userName = message.Author.Username + "#" + message.Author.Discriminator;
+
+                            // TODO method pour récupérer le username.
+
+                            messageToSend = MessageHandler.RemoveRole(args[0], userName);
+                        }
+                        else if (command == "-listRole")
+                        {
+                            messageToSend = MessageHandler.ListRole();
+                        }
+                        else if (command == "-react")
+                        {
+                            try
+                            {
+                                var sentMessage = await message.Channel.SendMessageAsync(MessageHandler.ReactTo());
+
+                                ReactionHandler.MessageToFollow(sentMessage.Id);
+                            }
+                            catch (Exception ex)
+                            {
+                                _ = Log(new LogMessage(LogSeverity.Error, "MessageToFollow", ex.Message));
+                            }
+
+                            return;
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                messageToSend = "Tag incorrect.";
+            }
+
+            if (!string.IsNullOrWhiteSpace(messageToSend))
+            {
+                try
+                {
+                    await message.Channel.SendMessageAsync(messageToSend);
+                }
+                catch (Exception ex)
+                {
+                    _ = Log(new LogMessage(LogSeverity.Error, "SendMessage", ex.Message));
+                }
+            }
+        }
+
+        /// <summary>
         /// Method executed when an action is added to a message.
         /// Used for role gestion.
         /// </summary>
@@ -198,109 +301,6 @@
         {
             Console.WriteLine(msg.ToString());
             return Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Executed when a message is received.
-        /// Used to manage messages sent by the users.
-        /// </summary>
-        /// <param name="message">Message sent on a channel where the bot is.</param>
-        /// <returns>The current method as a Task.</returns>
-        public async Task MessageReceived(SocketMessage message)
-        {
-            string messageToSend = string.Empty;
-            string request = message.Content;
-
-            try
-            {
-                if (request != null)
-                {
-                    if (request.StartsWith("-"))
-                    {
-                        SocketGuildChannel channel = (SocketGuildChannel)message.Channel;
-                        SocketGuild guild = channel.Guild;
-
-                        ulong serverId = guild.Id;
-                        ulong channelId = channel.Id;
-
-                        string command = GetCommand(request);
-
-                        if (command == "-set")
-                        {
-                            List<string> args = GetArguments(request);
-
-                            messageToSend = MessageHandler.SetSession(args[0] + " " + args[1], serverId, channelId);
-                        }
-                        else if (command == "-list")
-                        {
-                            messageToSend = MessageHandler.ListSession(serverId, channelId);
-                        }
-                        else if (command == "-delete")
-                        {
-                            List<string> args = GetArguments(request);
-
-                            messageToSend = MessageHandler.DeleteSession(int.Parse(args[0]), serverId, channelId);
-                        }
-                        else if (command == "-help")
-                        {
-                            messageToSend = MessageHandler.Help();
-                        }
-                        else if (command == "-addRole")
-                        {
-                            // TODO Gérer les rôles par serveur.
-
-                            List<string> args = GetArguments(request);
-                            string userName = message.Author.Username + "#" + message.Author.Discriminator;
-
-                            messageToSend = MessageHandler.AddRole(args[0], args[1], userName, guild.Roles.Select(r => r.Name).ToList());
-                        }
-                        else if (command == "-removeRole")
-                        {
-                            List<string> args = GetArguments(request);
-                            string userName = message.Author.Username + "#" + message.Author.Discriminator;
-
-                            // TODO method pour récupérer le username.
-
-                            messageToSend = MessageHandler.RemoveRole(args[0], userName);
-                        }
-                        else if (command == "-listRole")
-                        {
-                            messageToSend = MessageHandler.ListRole();
-                        }
-                        else if (command == "-react")
-                        {
-                            try
-                            {
-                                var sentMessage = await message.Channel.SendMessageAsync(MessageHandler.ReactTo());
-
-                                ReactionHandler.MessageToFollow(sentMessage.Id);
-                            }
-                            catch (Exception ex)
-                            {
-                                _ = Log(new LogMessage(LogSeverity.Error, "MessageToFollow", ex.Message));
-                            }
-
-                            return;
-                        }
-                    }
-                }
-            }
-            catch
-            {
-                messageToSend = "Tag incorrect.";
-            }
-
-            if (!string.IsNullOrWhiteSpace(messageToSend))
-            {
-                try
-                {
-                    await message.Channel.SendMessageAsync(messageToSend);
-                }
-                catch (Exception ex)
-                {
-                    _ = Log(new LogMessage(LogSeverity.Error, "SendMessage", ex.Message));
-                }
-            }
         }
     }
 }
