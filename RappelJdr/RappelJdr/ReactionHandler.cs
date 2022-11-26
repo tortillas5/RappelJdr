@@ -34,9 +34,9 @@
         /// Return the existing roles.
         /// </summary>
         /// <returns>List of roles.</returns>
-        public static List<Role> GetRoles()
+        public static List<Role> GetRoles(ulong serverId)
         {
-            return RoleService.GetEntities();
+            return RoleService.GetEntities().Where(e => e.ServerId == serverId).ToList();
         }
 
         /// <summary>
@@ -44,25 +44,28 @@
         /// </summary>
         /// <param name="idMessage">Id of a message.</param>
         /// <returns>Value indicating if a message is followed or not.</returns>
-        public static bool IsFollowedMessage(ulong idMessage)
+        public static bool IsFollowedMessage(ulong idMessage, ulong serverId)
         {
-            return FollowedMessageService.GetEntities().Exists(e => e.MessageId == idMessage);
+            return FollowedMessageService.GetEntities().Exists(e => e.ServerId == serverId && e.MessageId == idMessage);
         }
 
         /// <summary>
         /// Add a message to follow to the database.
         /// </summary>
         /// <param name="idMessage">Id of a message.</param>
-        public static void MessageToFollow(ulong idMessage)
+        public static void MessageToFollow(ulong idMessage, ulong serverId)
         {
             try
             {
                 FollowedMessage followedMessage = new FollowedMessage()
                 {
-                    MessageId = idMessage
+                    MessageId = idMessage,
+                    ServerId = serverId
                 };
 
-                FollowedMessageService.GetEntities().ForEach(e => FollowedMessageService.Remove(e));
+                FollowedMessageService.GetEntities()
+                    .Where(e => e.ServerId == serverId).ToList()
+                    .ForEach(e => FollowedMessageService.Remove(e));
 
                 FollowedMessageService.Add(followedMessage);
             }

@@ -9,5 +9,10 @@
         /// Id of an entity.
         /// </summary>
         public int Id { get; set; }
+
+        /// <summary>
+        /// Id of the server.
+        /// </summary>
+        public ulong ServerId { get; set; }
     }
 }

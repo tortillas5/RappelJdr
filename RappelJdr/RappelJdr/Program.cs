@@ -104,29 +104,27 @@
                         }
                         else if (command == "-addRole")
                         {
-                            // TODO Gérer les rôles par serveur.
-
                             List<string> args = GetArguments(request);
 
-                            messageToSend = MessageHandler.AddRole(args[0], args[1], GetUserName(message.Author), guild.Roles.Select(r => r.Name).ToList());
+                            messageToSend = MessageHandler.AddRole(args[0], args[1], GetUserName(message.Author), guild.Roles.Select(r => r.Name).ToList(), serverId);
                         }
                         else if (command == "-removeRole")
                         {
                             List<string> args = GetArguments(request);
 
-                            messageToSend = MessageHandler.RemoveRole(args[0], GetUserName(message.Author));
+                            messageToSend = MessageHandler.RemoveRole(args[0], GetUserName(message.Author), serverId);
                         }
                         else if (command == "-listRole")
                         {
-                            messageToSend = MessageHandler.ListRole();
+                            messageToSend = MessageHandler.ListRole(serverId);
                         }
                         else if (command == "-react")
                         {
                             try
                             {
-                                var sentMessage = await message.Channel.SendMessageAsync(MessageHandler.ReactTo());
+                                var sentMessage = await message.Channel.SendMessageAsync(MessageHandler.ReactTo(serverId));
 
-                                ReactionHandler.MessageToFollow(sentMessage.Id);
+                                ReactionHandler.MessageToFollow(sentMessage.Id, serverId);
                             }
                             catch (Exception ex)
                             {
@@ -168,9 +166,12 @@
         {
             try
             {
-                if (ReactionHandler.IsFollowedMessage(reaction.MessageId))
+                SocketGuild guild = ((SocketGuildChannel)channel.Value).Guild;
+                ulong serverId = guild.Id;
+
+                if (ReactionHandler.IsFollowedMessage(reaction.MessageId, serverId))
                 {
-                    var roles = ReactionHandler.GetRoles();
+                    var roles = ReactionHandler.GetRoles(serverId);
 
                     Role role = roles.FirstOrDefault(r => r.Emoji.Equals(reaction.Emote.Name));
 
@@ -201,9 +202,12 @@
         {
             try
             {
-                if (ReactionHandler.IsFollowedMessage(reaction.MessageId))
+                SocketGuild guild = ((SocketGuildChannel)channel.Value).Guild;
+                ulong serverId = guild.Id;
+
+                if (ReactionHandler.IsFollowedMessage(reaction.MessageId, serverId))
                 {
-                    var roles = ReactionHandler.GetRoles();
+                    var roles = ReactionHandler.GetRoles(serverId);
 
                     Role role = roles.FirstOrDefault(r => r.Emoji.Equals(reaction.Emote.Name));
 

@@ -21,10 +21,5 @@
         /// Name of the session.
         /// </summary>
         public string Name { get; set; }
-
-        /// <summary>
-        /// Id of the server's session.
-        /// </summary>
-        public ulong ServerId { get; set; }
     }
 }

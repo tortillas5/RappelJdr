@@ -163,12 +163,14 @@
         /// <param name="emoji">Emoji to be used as a reaction.</param>
         /// <param name="roleName">Name of the rôle to add.</param>
         /// <param name="userName">Name of the user adding the rôle (must be an admin).</param>
+        /// <param name="serverRoles">Existing roles of the server.</param>
+        /// <param name="serverId">Id of the server.</param>
         /// <returns>Message saying if the rôle was successfully added or not.</returns>
-        public static string AddRole(string emoji, string roleName, string userName, List<string> serverRoles)
+        public static string AddRole(string emoji, string roleName, string userName, List<string> serverRoles, ulong serverId)
         {
             try
             {
-                if (!IsAdmin(userName))
+                if (!IsAdmin(userName, serverId))
                 {
                     return "Vous n'avez pas le droit.";
                 }
@@ -193,7 +195,8 @@
                 Role role = new Role()
                 {
                     Emoji = emoji,
-                    Name = roleName
+                    Name = roleName,
+                    ServerId = serverId
                 };
 
                 RoleService.Add(role);
@@ -210,12 +213,13 @@
         /// Return the list of possible roles and their names if there is any.
         /// Return a message saying there is no role if there is none.
         /// </summary>
+        /// <param name="serverId">Id of the server.</param>
         /// <returns>A message.</returns>
-        public static string ListRole()
+        public static string ListRole(ulong serverId)
         {
             try
             {
-                var roles = RoleService.GetEntities();
+                var roles = RoleService.GetEntities().Where(e => e.ServerId == serverId);
 
                 if (roles.Count() > 0)
                 {
@@ -236,11 +240,11 @@
         /// Return a message to react to with the list of existing roles.
         /// </summary>
         /// <returns>A message.</returns>
-        public static string ReactTo()
+        public static string ReactTo(ulong serverId)
         {
             try
             {
-                var roles = RoleService.GetEntities();
+                var roles = RoleService.GetEntities().Where(e => e.ServerId == serverId);
 
                 if (roles.Count() > 0)
                 {
@@ -264,17 +268,18 @@
         /// </summary>
         /// <param name="emoji">Emoji of the role to remove.</param>
         /// <param name="userName">Name of the user removing the role (must be an admin).</param>
+        /// <param name="serverId">Id of the server.</param>
         /// <returns></returns>
-        public static string RemoveRole(string emoji, string userName)
+        public static string RemoveRole(string emoji, string userName, ulong serverId)
         {
             try
             {
-                if (!IsAdmin(userName))
+                if (!IsAdmin(userName, serverId))
                 {
                     return "Vous n'avez pas le droit.";
                 }
 
-                var role = RoleService.GetEntities().FirstOrDefault(e => e.Emoji == emoji);
+                var role = RoleService.GetEntities().FirstOrDefault(e => e.ServerId == serverId && e.Emoji == emoji);
 
                 if (role != null)
                 {
@@ -297,10 +302,11 @@
         /// Check wether a user is admin or not.
         /// </summary>
         /// <param name="userName">Name of an user.</param>
+        /// <param name="serverId">Id of the server.</param>
         /// <returns>Value indicating if the user is admin or not.</returns>
-        private static bool IsAdmin(string userName)
+        private static bool IsAdmin(string userName, ulong serverId)
         {
-            return AdminService.GetEntities().Exists(e => e.Name == userName);
+            return AdminService.GetEntities().Exists(e => e.ServerId == serverId && e.Name == userName);
         }
 
         #endregion Roles
