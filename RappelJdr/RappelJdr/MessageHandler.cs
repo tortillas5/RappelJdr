@@ -245,6 +245,7 @@
                 if (roles.Count() > 0)
                 {
                     return "Réagissez à ce message pour vous ajouter / retirer un rôle.\n" +
+                        "Les anciens messages sont ignorés.\n" +
                         "Liste des rôles :\n" + String.Join("\n", roles.Select(e => e.Emoji + " : " + e.Name));
                 }
                 else

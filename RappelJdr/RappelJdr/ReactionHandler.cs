@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using RappelJdr.Database;
     using RappelJdr.Entities;
 
@@ -60,6 +61,8 @@
                 {
                     MessageId = idMessage
                 };
+
+                FollowedMessageService.GetEntities().ForEach(e => FollowedMessageService.Remove(e));
 
                 FollowedMessageService.Add(followedMessage);
             }
