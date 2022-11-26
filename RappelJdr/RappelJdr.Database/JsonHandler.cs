@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using TortillasEntities;
-
-namespace TortillasDatabase
+﻿namespace RappelJdr.Database
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using RappelJdr.Entities;
+
     /// <summary>
     /// Class handling the database with json files (one per type).
     /// </summary>

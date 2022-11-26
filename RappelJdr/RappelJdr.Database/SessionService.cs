@@ -1,6 +1,6 @@
-﻿namespace TortillasDatabase
+﻿namespace RappelJdr.Database
 {
-    using TortillasEntities;
+    using RappelJdr.Entities;
 
     /// <summary>
     /// Classe de service pour les entités de type Session.

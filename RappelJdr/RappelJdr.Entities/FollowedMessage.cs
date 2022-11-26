@@ -1,7 +1,5 @@
 ﻿namespace RappelJdr.Entities
 {
-    using TortillasEntities;
-
     /// <summary>
     /// Entity type followed message.
     /// </summary>

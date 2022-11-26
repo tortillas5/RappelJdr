@@ -1,4 +1,4 @@
-﻿namespace TortillasEntities
+﻿namespace RappelJdr.Entities
 {
     using System;
 

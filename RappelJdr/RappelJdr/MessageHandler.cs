@@ -7,8 +7,6 @@
     using System.Reflection;
     using RappelJdr.Database;
     using RappelJdr.Entities;
-    using TortillasDatabase;
-    using TortillasEntities;
 
     /// <summary>
     /// Class handling the messages of the users.

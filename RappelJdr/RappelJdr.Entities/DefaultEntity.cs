@@ -1,4 +1,4 @@
-﻿namespace TortillasEntities
+﻿namespace RappelJdr.Entities
 {
     /// <summary>
     /// Represent the shared properties of all the entities.

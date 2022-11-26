@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-
-namespace TortillasDatabase
+﻿namespace RappelJdr.Database
 {
+    using System.Collections.Generic;
+
     /// <summary>
     /// Classe implémentant les méthodes principales partagées des services.
     /// </summary>
