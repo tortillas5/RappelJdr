@@ -218,7 +218,7 @@
 
                 if (roles.Count() > 0)
                 {
-                    return "Liste des rôles :\n" + String.Join("\n", roles.Select(e => e.Emoji + " : " + e.Name).OrderBy(e => e));
+                    return "Liste des rôles :\n" + String.Join("\n", roles.OrderBy(r => r.Name).Select(e => e.Emoji + " : " + e.Name));
                 }
                 else
                 {
@@ -245,7 +245,7 @@
                 {
                     return "Réagissez à ce message pour vous ajouter / retirer un rôle.\n" +
                         "Les anciens messages sont ignorés.\n" +
-                        "Liste des rôles :\n" + String.Join("\n", roles.Select(e => e.Emoji + " : " + e.Name).OrderBy(e => e));
+                        "Liste des rôles :\n" + String.Join("\n", roles.OrderBy(r => r.Name).Select(e => e.Emoji + " : " + e.Name));
                 }
                 else
                 {
