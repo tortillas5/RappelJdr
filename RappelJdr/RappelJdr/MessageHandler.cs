@@ -175,7 +175,7 @@
                     return "Ce rôle n'existe pas sur le serveur.";
                 }
 
-                var roles = RoleService.GetEntities();
+                var roles = RoleService.GetEntities().Where(e => e.ServerId == serverId).ToList();
 
                 if (roles.Exists(e => e.Emoji == emoji))
                 {
@@ -218,7 +218,7 @@
 
                 if (roles.Count() > 0)
                 {
-                    return "Liste des rôles :\n" + String.Join("\n", roles.Select(e => e.Emoji + " : " + e.Name));
+                    return "Liste des rôles :\n" + String.Join("\n", roles.Select(e => e.Emoji + " : " + e.Name).OrderBy(e => e));
                 }
                 else
                 {
@@ -245,7 +245,7 @@
                 {
                     return "Réagissez à ce message pour vous ajouter / retirer un rôle.\n" +
                         "Les anciens messages sont ignorés.\n" +
-                        "Liste des rôles :\n" + String.Join("\n", roles.Select(e => e.Emoji + " : " + e.Name));
+                        "Liste des rôles :\n" + String.Join("\n", roles.Select(e => e.Emoji + " : " + e.Name).OrderBy(e => e));
                 }
                 else
                 {
