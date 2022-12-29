@@ -43,6 +43,8 @@
             string text = File.ReadAllText(path);
             Token token = (Token)JsonConvert.DeserializeObject(text, typeof(Token));
 
+            // TODO : config file.
+
             await _client.LoginAsync(TokenType.Bot, token.Value);
             await _client.StartAsync();
 
@@ -109,7 +111,7 @@
                             var userGuild = (SocketGuildUser)message.Author;
                             bool adminUser = userGuild.GuildPermissions.Has(GuildPermission.ManageRoles);
 
-                            messageToSend = MessageHandler.AddRole(args[0], string.Join(" ", args.Skip(1)), GetUserName(message.Author), guild.Roles.Select(r => r.Name).ToList(), serverId, adminUser);
+                            messageToSend = MessageHandler.AddRole(args[0], string.Join(" ", args.Skip(1)), guild.Roles.Select(r => r.Name).ToList(), serverId, adminUser);
                         }
                         else if (command == "-removeRole")
                         {
@@ -117,7 +119,7 @@
                             var userGuild = (SocketGuildUser)message.Author;
                             bool adminUser = userGuild.GuildPermissions.Has(GuildPermission.ManageRoles);
 
-                            messageToSend = MessageHandler.RemoveRole(args[0], GetUserName(message.Author), serverId, adminUser);
+                            messageToSend = MessageHandler.RemoveRole(args[0], serverId, adminUser);
                         }
                         else if (command == "-listRole")
                         {
@@ -127,9 +129,18 @@
                         {
                             try
                             {
+                                // Envoie le message "réagir à ce message"
                                 var sentMessage = await message.Channel.SendMessageAsync(MessageHandler.ReactTo(serverId));
 
+                                // Ajoute le message aux messages à follow pour les rôles.
                                 ReactionHandler.MessageToFollow(sentMessage.Id, serverId);
+
+                                /// Récupère les rôles paramétrés du serveur.
+                                var roles = ReactionHandler.GetRoles(serverId).Select(r => r.Emoji);
+                                List<Emote> emotes = roles.Select(r => r.Length > 1 ? Emote.Parse(r) : Emote.Parse(r)).ToList();
+
+                                // Ajoute les réactions au message.
+                                await sentMessage.AddReactionsAsync(emotes);
                             }
                             catch (Exception ex)
                             {
@@ -308,16 +319,6 @@
             int end = personnalizedEmoji.LastIndexOf(":");
 
             return personnalizedEmoji.Substring(begining + 1, end - begining - 1);
-        }
-
-        /// <summary>
-        /// Return the full username (name#1234) of a SockerUser.
-        /// </summary>
-        /// <param name="user">A socketUser.</param>
-        /// <returns>A full username.</returns>
-        private string GetUserName(SocketUser user)
-        {
-            return user.Username + "#" + user.Discriminator;
         }
 
         /// <summary>

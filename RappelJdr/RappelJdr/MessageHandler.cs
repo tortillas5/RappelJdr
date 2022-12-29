@@ -156,12 +156,11 @@
         /// </summary>
         /// <param name="emoji">Emoji to be used as a reaction.</param>
         /// <param name="roleName">Name of the rôle to add.</param>
-        /// <param name="userName">Name of the user adding the rôle (must be an admin).</param>
         /// <param name="serverRoles">Existing roles of the server.</param>
         /// <param name="serverId">Id of the server.</param>
         /// <param name="isAdmin">Value indicating if the user is admin of the server.</param>
         /// <returns>Message saying if the rôle was successfully added or not.</returns>
-        public static string AddRole(string emoji, string roleName, string userName, List<string> serverRoles, ulong serverId, bool isAdmin)
+        public static string AddRole(string emoji, string roleName, List<string> serverRoles, ulong serverId, bool isAdmin)
         {
             try
             {
@@ -262,11 +261,10 @@
         /// Remove a role with it's linked emoji.
         /// </summary>
         /// <param name="emoji">Emoji of the role to remove.</param>
-        /// <param name="userName">Name of the user removing the role (must be an admin).</param>
         /// <param name="serverId">Id of the server.</param>
         /// <param name="isAdmin">Value indicating if the user is admin of the server.</param>
         /// <returns>A message.</returns>
-        public static string RemoveRole(string emoji, string userName, ulong serverId, bool isAdmin)
+        public static string RemoveRole(string emoji, ulong serverId, bool isAdmin)
         {
             try
             {
