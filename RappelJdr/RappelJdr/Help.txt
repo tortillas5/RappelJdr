@@ -7,3 +7,6 @@ Liste des commandes :
 -removeRole [Emoji] Supprime un rôle et son émoji de la liste des réactions.
 -listRole Liste des rôles définis et leur émojis.
 -react Envoie un message qui sert à gérer les rôles quand on y réagit.
+-spam [Message] Ajoute un message qui sera envoyé une fois par jour.
+-spamList Liste les messages qui seront envoyés une fois par jour.
+-spamDelete [Number] Supprime un spam à partir de son identifiant.
