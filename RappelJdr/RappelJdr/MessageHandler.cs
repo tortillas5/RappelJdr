@@ -21,6 +21,7 @@
         {
             SessionService = new SessionService();
             RoleService = new RoleService();
+            SpamService = new SpamService();
         }
 
         /// <summary>
@@ -32,6 +33,11 @@
         /// Get or set the service of the sessions.
         /// </summary>
         public static SessionService SessionService { get; set; }
+
+        /// <summary>
+        /// Get or set the service of the spams.
+        /// </summary>
+        public static SpamService SpamService { get; set; }
 
         /// <summary>
         /// Retourne la liste des commandes utilisables par le bot.
@@ -148,6 +154,103 @@
         }
 
         #endregion Sessions
+
+        #region Spams
+
+        /// <summary>
+        /// Delete a spam.
+        /// </summary>
+        /// <param name="id">Id of a spam.</param>
+        /// <param name="serverId">Id of the server sending the request.</param>
+        /// <param name="channelId">Id of the channel sending the request.</param>
+        /// <returns>Message saying if the deletion succeded or not.</returns>
+        public static string DeleteSpam(int id, ulong serverId, ulong channelId)
+        {
+            try
+            {
+                var spam = SpamService.GetEntities().FirstOrDefault(e => e.ServerId == serverId && e.ChannelId == channelId && e.Id == id);
+
+                if (spam != null)
+                {
+                    SpamService.RemoveById(id);
+
+                    return "Le spam a bien été supprimé.";
+                }
+                else
+                {
+                    return "Aucun spam avec cet identifiant à supprimer.";
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
+        /// <summary>
+        /// Return a message with the list of the spams.
+        /// Return a message saying no spam if there is none.
+        /// </summary>
+        /// <param name="serverId">Id of the server sending the request.</param>
+        /// <param name="channelId">Id of the channel sending the request.</param>
+        /// <returns>A message.</returns>
+        public static string ListSpam(ulong serverId, ulong channelId)
+        {
+            try
+            {
+                var spams = SpamService.GetEntities().Where(e => e.ServerId == serverId && e.ChannelId == channelId);
+
+                if (spams.Count() > 0)
+                {
+                    return "Spams prévus :\n" + String.Join("\n", spams.Select(s => "Id : " + s.Id.ToString() + " Message : " + s.Message));
+                }
+                else
+                {
+                    return "Pas de prochain spam prévu.";
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
+        /// <summary>
+        /// Add a spam.
+        /// </summary>
+        /// <param name="serverId">Id of the server sending the request.</param>
+        /// <param name="channelId">Id of the channel sending the request.</param>
+        /// <param name="message">Spam message that will be sent.</param>
+        /// <returns>Message saying if the adding was successful or not.</returns>
+        public static string SetSpam(ulong serverId, ulong channelId, string message)
+        {
+            try
+            {
+                var spams = SpamService.GetEntities();
+
+                if (spams.Exists(m => m.ServerId == serverId && m.ChannelId == channelId && m.Message == message))
+                {
+                    return "Ce spam existe déjà.";
+                }
+
+                Spam spam = new Spam()
+                {
+                    ServerId = serverId,
+                    ChannelId = channelId,
+                    Message = message
+                };
+
+                SpamService.Add(spam);
+
+                return "Le spam a bien été ajoutée.";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
+        #endregion Spams
 
         #region Roles
 

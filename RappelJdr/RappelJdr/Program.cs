@@ -56,6 +56,9 @@
             Thread sessionsMessagesThread = new Thread(new ThreadStart(SendMessageSessions));
             sessionsMessagesThread.Start();
 
+            Thread spamsMessagesThread = new Thread(new ThreadStart(SendMessageSpams));
+            spamsMessagesThread.Start();
+
             // Block this task until the program is closed.
             await Task.Delay(-1);
         }
@@ -100,6 +103,23 @@
                             List<string> args = GetArguments(request);
 
                             messageToSend = MessageHandler.DeleteSession(int.Parse(args[0]), serverId, channelId);
+                        }
+                        else if (command == "-spam")
+                        {
+                            List<string> args = GetArguments(request);
+                            string spam = string.Concat(request.Skip(request.IndexOf(" ")));
+
+                            messageToSend = MessageHandler.SetSpam(serverId, channelId, spam);
+                        }
+                        else if (command == "-spamList")
+                        {
+                            messageToSend = MessageHandler.ListSpam(serverId, channelId);
+                        }
+                        else if (command == "-spamDelete")
+                        {
+                            List<string> args = GetArguments(request);
+
+                            messageToSend = MessageHandler.DeleteSpam(int.Parse(args[0]), serverId, channelId);
                         }
                         else if (command == "-help")
                         {
@@ -285,6 +305,36 @@
                 }
 
                 Thread.Sleep(new TimeSpan(0, 59, 0));
+            }
+        }
+
+        /// <summary>
+        /// Tâche s'occupant d'envoyer les messages de spams aux cannaux correspondants.
+        /// </summary>
+        public async void SendMessageSpams()
+        {
+            // Au lancement de l'application on attend une dizaine de secondes que le bot soit connecté à discord.
+            Thread.Sleep(10000);
+
+            // Tant que le programme tourne.
+            while (true)
+            {
+                var spams = MessageHandler.SpamService.GetEntities();
+
+                foreach (var spam in spams)
+                {
+                    try
+                    {
+                        // Envoie un spam.
+                        await _client.GetGuild(spam.ServerId).GetTextChannel(spam.ChannelId).SendMessageAsync(spam.Message);
+                    }
+                    catch (Exception ex)
+                    {
+                        _ = Log(new LogMessage(LogSeverity.Error, "SendMessageSpams", ex.Message));
+                    }
+                }
+
+                Thread.Sleep(new TimeSpan(23, 59, 0));
             }
         }
 
